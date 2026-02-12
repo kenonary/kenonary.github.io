@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <title>創儀 案内</title>
+  <style>
+    html, body {
+      margin: 0; padding: 0;
+      width: 100vw; height: 100vh;
+      overflow: hidden;
+      background: #fff;
+      color: #000;
+      -webkit-user-select: none;
+      user-select: none;
+      touch-action: manipulation;
+      font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+    }
+    .wrap {
+      box-sizing: border-box;
+      width: 100vw; height: 100vh;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      width: min(92vw, 900px);
+      height: min(86vh, 1200px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 22px;
+    }
+    .title {
+      font-size: clamp(32px, 5vw, 56px);
+      letter-spacing: 0.02em;
+      line-height: 1.25;
+      white-space: pre-wrap;
+    }
+    .body {
+      font-size: clamp(18px, 2.8vw, 34px);
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+    .hint {
+      font-size: clamp(16px, 2.2vw, 26px);
+      opacity: 0.85;
+      white-space: pre-wrap;
+    }
+    .footer {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      padding: 14px 18px calc(14px + env(safe-area-inset-bottom)) 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 18px;
+      opacity: 0.8;
+    }
+    .btn {
+      padding: 10px 14px;
+      border: 1px solid #000;
+      border-radius: 999px;
+      font-size: 16px;
+      background: transparent;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap" id="tapArea">
+    <div class="card">
+      <div class="title" id="t"></div>
+      <div class="body" id="b"></div>
+      <div class="hint" id="h"></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <button class="btn" id="homeBtn">トップ</button>
+    <div id="page"></div>
+    <button class="btn" id="backBtn">戻る</button>
+  </div>
+
+  <script>
+    const pages = [
+      {
+        t: "故　　　　創儀会場",
+        b: "画面に触れて\n参列手順を表示",
+        h: "（名前の欄は空欄）"
+      },
+      {
+        t: "電子焼香の手順",
+        b: "焼香台の手前で一礼\n\n焼香台の前までお進みください\n\n右枠 → 左枠の順に二度触れてください\n\n左枠の表示が収束するまでお待ちください\n\n一礼",
+        h: ""
+      },
+      {
+        t: "",
+        b: "ここでは未完成の創作物の葬儀を行っております\n\n様々な理由により未完成となった作品へ想いを寄せる場です\n\n作品は椅子にお掛けになってご覧いただけます",
+        h: ""
+      },
+      {
+        t: "",
+        b: "正面のモニターでは、供養データの一部を遺影として表示しています\n\n映像・音楽・文字などの様々な媒体の創作物が投影されます\n\n電子焼香に表示された文字列は、供養データをテキスト化したものです",
+        h: ""
+      },
+      {
+        t: "電子音響による儀礼的自動演奏",
+        b: "12:00　14:00　16:00　18:00（13,14日のみ）\n\n各回15分\n\n※状況によって不定期演奏も行われます",
+        h: ""
+      },
+      {
+        t: "創儀 - Rejected in Peace",
+        b: "制作全般\n◯▲⬜︎　zerobe\n\n協力\nとがさん　わたえい　木葉はづく　EPOCALC　原口沙輔\n\n取材協力\nいととと　今井科学　こんぺいとう雑誌　EPOCALC　キョウ玉　原口沙輔　とがさん　.+　zerobe　木葉はづく\n\nQRより\n供養フォーム / 公式SNS",
+        h: ""
+      },
+      {
+        t: "音声案内",
+        b: "QRを読み取ると\n音声による展示解説を再生できます",
+        h: ""
+      }
+    ];
+
+    let idx = 0;
+    const idleMs = 45 * 1000; // 無操作でトップへ戻す時間
+    let idleTimer = null;
+
+    const tEl = document.getElementById("t");
+    const bEl = document.getElementById("b");
+    const hEl = document.getElementById("h");
+    const pageEl = document.getElementById("page");
+
+    function render() {
+      const p = pages[idx];
+      tEl.textContent = p.t || "";
+      bEl.textContent = p.b || "";
+      hEl.textContent = p.h || "";
+      pageEl.textContent = `${idx + 1} / ${pages.length}`;
+    }
+
+    function toHome() { idx = 0; render(); }
+    function back() { idx = (idx - 1 + pages.length) % pages.length; render(); }
+    function next() { idx = (idx + 1) % pages.length; render(); }
+
+    function resetIdle() {
+      if (idleTimer) clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => { toHome(); }, idleMs);
+    }
+
+    // 画面タップで次へ
+    document.getElementById("tapArea").addEventListener("touchstart", (e) => {
+      resetIdle();
+      next();
+    }, { passive: true });
+
+    // 予備：クリックでも動く
+    document.getElementById("tapArea").addEventListener("click", () => {
+      resetIdle();
+      next();
+    });
+
+    document.getElementById("homeBtn").addEventListener("click", () => { resetIdle(); toHome(); });
+    document.getElementById("backBtn").addEventListener("click", () => { resetIdle(); back(); });
+
+    // 何か操作したらアイドルを延命
+    ["touchstart","touchmove","click","keydown"].forEach(ev =>
+      document.addEventListener(ev, resetIdle, { passive: true })
+    );
+
+    render();
+    resetIdle();
+  </script>
+</body>
+</html>
