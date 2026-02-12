@@ -121,54 +121,80 @@
       }
     ];
 
-    let idx = 0;
-    const idleMs = 45 * 1000; // 無操作でトップへ戻す時間
-    let idleTimer = null;
+let idx = 0;
+const idleMs = 40 * 1000; // 無操作でトップへ戻す時間：40秒
+let idleTimer = null;
 
-    const tEl = document.getElementById("t");
-    const bEl = document.getElementById("b");
-    const hEl = document.getElementById("h");
-    const pageEl = document.getElementById("page");
+const tEl = document.getElementById("t");
+const bEl = document.getElementById("b");
+const hEl = document.getElementById("h");
+const pageEl = document.getElementById("page");
 
-    function render() {
-      const p = pages[idx];
-      tEl.textContent = p.t || "";
-      bEl.textContent = p.b || "";
-      hEl.textContent = p.h || "";
-      pageEl.textContent = `${idx + 1} / ${pages.length}`;
-    }
+function render() {
+  const p = pages[idx];
+  tEl.textContent = p.t || "";
+  bEl.textContent = p.b || "";
+  hEl.textContent = p.h || "";
+  pageEl.textContent = `${idx + 1} / ${pages.length}`;
+}
 
-    function toHome() { idx = 0; render(); }
-    function back() { idx = (idx - 1 + pages.length) % pages.length; render(); }
-    function next() { idx = (idx + 1) % pages.length; render(); }
+function toHome() { idx = 0; render(); }
+function back() { idx = (idx - 1 + pages.length) % pages.length; render(); }
+function next() { idx = (idx + 1) % pages.length; render(); }
 
-    function resetIdle() {
-      if (idleTimer) clearTimeout(idleTimer);
-      idleTimer = setTimeout(() => { toHome(); }, idleMs);
-    }
+function resetIdle() {
+  if (idleTimer) clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => { toHome(); }, idleMs);
+}
 
-    // 画面タップで次へ
-    document.getElementById("tapArea").addEventListener("touchstart", (e) => {
-      resetIdle();
-      next();
-    }, { passive: true });
+// pointer系だけで統一（iPad/PC両対応、二重発火しにくい）
+const tapArea = document.getElementById("tapArea");
 
-    // 予備：クリックでも動く
-    document.getElementById("tapArea").addEventListener("click", () => {
-      resetIdle();
-      next();
-    });
+// ページ送りは「離した瞬間」にする（押しっぱなしでも暴発しにくい）
+tapArea.addEventListener("pointerup", (e) => {
+  // ボタン類を押した場合はここでは送らない
+  if (e.target.closest("button")) return;
 
-    document.getElementById("homeBtn").addEventListener("click", () => { resetIdle(); toHome(); });
-    document.getElementById("backBtn").addEventListener("click", () => { resetIdle(); back(); });
+  e.preventDefault(); // iOSの後続click抑止に効くことが多い
+  resetIdle();
+  next();
+}, { passive: false });
 
-    // 何か操作したらアイドルを延命
-    ["touchstart","touchmove","click","keydown"].forEach(ev =>
-      document.addEventListener(ev, resetIdle, { passive: true })
-    );
+// もし古い環境でpointerが無い時の保険（ほぼ不要だが一応）
+tapArea.addEventListener("touchend", (e) => {
+  if (window.PointerEvent) return; // pointerがあるなら無視
+  e.preventDefault();
+  resetIdle();
+  next();
+}, { passive: false });
 
-    render();
-    resetIdle();
+tapArea.addEventListener("click", (e) => {
+  if (window.PointerEvent) return; // pointerがあるなら無視
+  if (e.target.closest("button")) return;
+  resetIdle();
+  next();
+});
+
+document.getElementById("homeBtn").addEventListener("click", (e) => {
+  e.stopPropagation();
+  resetIdle();
+  toHome();
+});
+
+document.getElementById("backBtn").addEventListener("click", (e) => {
+  e.stopPropagation();
+  resetIdle();
+  back();
+});
+
+// 無操作判定は pointerdown などで延命
+["pointerdown","pointermove","keydown"].forEach(ev =>
+  document.addEventListener(ev, resetIdle, { passive: true })
+);
+
+render();
+resetIdle();
+
   </script>
 </body>
 </html>
