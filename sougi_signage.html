@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>創儀 - Rejected in Peace</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: "游明朝", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "HG明朝E", "ＭＳ Ｐ明朝", serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: none;
+        }
+
+        #container {
+            width: 100%;
+            height: 100%;
+            max-width: 100vh;
+            max-height: 133.33vw;
+            aspect-ratio: 3 / 4;
+            background: #000;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page {
+            display: none;
+            width: 100%;
+            height: 100%;
+            padding: 6%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        .page-number {
+            position: absolute;
+            bottom: 3%;
+            right: 4%;
+            font-size: clamp(12px, 2vh, 18px);
+            opacity: 0.6;
+        }
+
+        /* Page 1 - Top */
+        #page1 {
+            font-size: clamp(24px, 5vh, 48px);
+            line-height: 2;
+        }
+
+        #page1 .title {
+            font-size: clamp(32px, 6vh, 64px);
+            margin-bottom: 8vh;
+        }
+
+        #page1 .name-line {
+            margin: 4vh 0;
+            border-bottom: 2px solid #fff;
+            width: 60%;
+            padding-bottom: 1vh;
+        }
+
+        #page1 .venue {
+            margin-top: 2vh;
+        }
+
+        #page1 .instruction {
+            margin-top: 12vh;
+            font-size: clamp(18px, 3.5vh, 32px);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        /* Page 2 - Instructions */
+        #page2 .heading {
+            font-size: clamp(28px, 5.5vh, 48px);
+            margin-bottom: 6vh;
+            padding-bottom: 2vh;
+            border-bottom: 1px solid #fff;
+            width: 80%;
+        }
+
+        #page2 .step {
+            font-size: clamp(20px, 4vh, 36px);
+            line-height: 2.2;
+            margin: 1.5vh 0;
+            text-align: left;
+            width: 85%;
+        }
+
+        /* Pages 3-7 - Content */
+        .content-page .heading {
+            font-size: clamp(26px, 5vh, 44px);
+            margin-bottom: 5vh;
+            padding-bottom: 2vh;
+            border-bottom: 1px solid #fff;
+            width: 85%;
+        }
+
+        .content-page .text {
+            font-size: clamp(18px, 3.8vh, 34px);
+            line-height: 2;
+            margin: 2vh 0;
+            width: 90%;
+            text-align: left;
+        }
+
+        .content-page .small-text {
+            font-size: clamp(16px, 3.2vh, 28px);
+        }
+
+        /* Page 5 - Schedule */
+        #page5 .schedule {
+            font-size: clamp(20px, 4.2vh, 38px);
+            line-height: 2;
+            margin: 3vh 0;
+        }
+
+        #page5 .note {
+            font-size: clamp(16px, 3.2vh, 28px);
+            margin-top: 3vh;
+        }
+
+        /* Page 6 - Credits */
+        #page6 .credits-section {
+            width: 90%;
+            text-align: left;
+            margin: 1.5vh 0;
+            font-size: clamp(16px, 3.5vh, 32px);
+            line-height: 1.8;
+        }
+
+        #page6 .credits-title {
+            font-weight: bold;
+            margin-bottom: 1vh;
+        }
+
+        #page6 .qr-text {
+            margin-top: 4vh;
+            font-size: clamp(18px, 3.8vh, 34px);
+        }
+
+        /* Page 7 - Audio Guide */
+        #page7 .icon {
+            font-size: clamp(60px, 12vh, 120px);
+            margin: 4vh 0;
+        }
+
+        /* Navigation hint */
+        .nav-hint {
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: clamp(14px, 2.8vh, 24px);
+            opacity: 0.5;
+            display: none;
+        }
+
+        .page.active .nav-hint {
+            display: block;
+        }
+
+        #page1 .nav-hint {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <!-- Page 1: Top -->
+        <div id="page1" class="page active">
+            <div class="title">故</div>
+            <div class="name-line"></div>
+            <div class="venue">創儀会場</div>
+            <div class="instruction">画面に触れて<br>参列手順を表示</div>
+        </div>
+
+        <!-- Page 2: Instructions -->
+        <div id="page2" class="page content-page">
+            <div class="heading">電子焼香の手順</div>
+            <div class="text">
+                <div class="step">焼香台の手前で一礼</div>
+                <div class="step">焼香台の前までお進みください</div>
+                <div class="step">右枠 → 左枠の順に二度触れてください</div>
+                <div class="step">左枠の表示が収束するまでお待ちください</div>
+                <div class="step">一礼</div>
+            </div>
+            <div class="page-number">1/6</div>
+            <div class="nav-hint">画面をタッチして次へ →</div>
+        </div>
+
+        <!-- Page 3: About -->
+        <div id="page3" class="page content-page">
+            <div class="text">
+                ここでは未完成の創作物の葬儀を行っております
+            </div>
+            <div class="text" style="margin-top: 6vh;">
+                様々な理由により未完成となった作品へ想いを寄せる場です
+            </div>
+            <div class="text" style="margin-top: 6vh;">
+                作品は椅子にお掛けになってご覧いただけます
+            </div>
+            <div class="page-number">2/6</div>
+            <div class="nav-hint">画面をタッチして次へ →</div>
+        </div>
+
+        <!-- Page 4: Display Info -->
+        <div id="page4" class="page content-page">
+            <div class="text">
+                正面のモニターでは、供養データの一部を遺影として表示しています
+            </div>
+            <div class="text" style="margin-top: 5vh;">
+                映像・音楽・文字などの様々な媒体の創作物が投影されます
+            </div>
+            <div class="text" style="margin-top: 5vh;">
+                電子焼香に表示された文字列は、供養データをテキスト化したものです
+            </div>
+            <div class="page-number">3/6</div>
+            <div class="nav-hint">画面をタッチして次へ →</div>
+        </div>
+
+        <!-- Page 5: Performance Schedule -->
+        <div id="page5" class="page content-page">
+            <div class="heading">電子音響による儀礼的自動演奏</div>
+            <div class="schedule">
+                12:00　14:00<br>
+                16:00　18:00<br>
+                <span class="small-text">（13,14日のみ）</span>
+            </div>
+            <div class="schedule">各回15分</div>
+            <div class="note">※状況によって不定期演奏も行われます</div>
+            <div class="page-number">4/6</div>
+            <div class="nav-hint">画面をタッチして次へ →</div>
+        </div>
+
+        <!-- Page 6: Credits -->
+        <div id="page6" class="page content-page">
+            <div class="heading">創儀 - Rejected in Peace</div>
+            <div class="credits-section">
+                <div class="credits-title">制作全般</div>
+                <div>◯▲⬜︎　zerobe</div>
+            </div>
+            <div class="credits-section">
+                <div class="credits-title">協力</div>
+                <div class="small-text">とがさん　わたえい　木葉はづく<br>EPOCALC　原口沙輔</div>
+            </div>
+            <div class="credits-section">
+                <div class="credits-title">取材協力</div>
+                <div class="small-text">いととと　今井科学　こんぺいとう雑誌<br>EPOCALC　キョウ玉　原口沙輔　とがさん<br>.+　zerobe　木葉はづく</div>
+            </div>
+            <div class="qr-text">
+                QRより<br>
+                供養フォーム / 公式SNS
+            </div>
+            <div class="page-number">5/6</div>
+            <div class="nav-hint">画面をタッチして次へ →</div>
+        </div>
+
+        <!-- Page 7: Audio Guide -->
+        <div id="page7" class="page content-page">
+            <div class="heading">音声案内</div>
+            <div class="icon">🔊</div>
+            <div class="text">
+                QRを読み取ると<br>
+                音声による展示解説を再生できます
+            </div>
+            <div class="page-number">6/6</div>
+            <div class="nav-hint">画面をタッチして最初に戻る</div>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 0;
+        let resetTimer = null;
+        const pages = document.querySelectorAll('.page');
+        const RESET_DELAY = 30000; // 30 seconds
+
+        function showPage(index) {
+            pages.forEach(page => page.classList.remove('active'));
+            pages[index].classList.add('active');
+            currentPage = index;
+            
+            // Reset timer whenever page changes
+            clearTimeout(resetTimer);
+            if (currentPage !== 0) {
+                resetTimer = setTimeout(() => {
+                    showPage(0);
+                }, RESET_DELAY);
+            }
+        }
+
+        function nextPage() {
+            const next = (currentPage + 1) % pages.length;
+            showPage(next);
+        }
+
+        // Touch event handling
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        document.getElementById('container').addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        document.getElementById('container').addEventListener('touchend', (e) => {
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            
+            const diffX = Math.abs(touchEndX - touchStartX);
+            const diffY = Math.abs(touchEndY - touchStartY);
+            
+            // If it's a tap (not a swipe)
+            if (diffX < 10 && diffY < 10) {
+                nextPage();
+            }
+        }, { passive: true });
+
+        // Mouse event for testing on desktop
+        document.getElementById('container').addEventListener('click', () => {
+            nextPage();
+        });
+
+        // Prevent default touch behavior
+        document.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+
+        // Wake lock to keep screen on (if supported)
+        if ('wakeLock' in navigator) {
+            let wakeLock = null;
+            const requestWakeLock = async () => {
+                try {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                } catch (err) {
+                    console.log('Wake Lock error:', err);
+                }
+            };
+            requestWakeLock();
+            
+            document.addEventListener('visibilitychange', async () => {
+                if (document.visibilityState === 'visible') {
+                    requestWakeLock();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
