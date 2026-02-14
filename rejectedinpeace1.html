@@ -6,7 +6,7 @@
   <title>創儀 案内</title>
   <style>
     html, body{
-      margin:0; padding:0;
+      margin:0; padding:0;1
       width:100vw; height:100vh;
       overflow:hidden;
       background:#fff; color:#000;
@@ -108,11 +108,11 @@
       <div id="qrArea" style="display:none;">
         <div class="qrRow">
           <div class="qrBlock">
-            <div class="qrLabel">公式SNS（X）</div>
+            <div class="qrLabel">X（Twitter）</div>
             <img class="qrImg" id="qrX" alt="X QR">
           </div>
           <div class="qrBlock">
-            <div class="qrLabel">公式SNS（Instagram）</div>
+            <div class="qrLabel">Instagram</div>
             <img class="qrImg" id="qrIG" alt="Instagram QR">
           </div>
         </div>
@@ -234,7 +234,7 @@
         hEl.textContent = p.h || "";
         pageEl.textContent = `${idx + 1} / ${pages.length}`;
 
-        const isQR = (p.t === "公式SNS　QR");
+        const isQR = (p.t === "公式SNS");
         qrArea.style.display = isQR ? "block" : "none";
         if (isQR){
           qrX.src = QR_X_URL;
