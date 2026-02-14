@@ -5,51 +5,59 @@
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, viewport-fit=cover, user-scalable=no" />
   <title>創儀 案内</title>
   <style>
-    html, body {
-      margin: 0; padding: 0;
-      width: 100vw; height: 100vh;
-      overflow: hidden;
-      background: #fff;
-      color: #000;
-      -webkit-user-select: none;
-      user-select: none;
+    html, body{
+      margin:0; padding:0;
+      width:100vw; height:100vh;
+      overflow:hidden;
+      background:#fff; color:#000;
+      -webkit-user-select:none; user-select:none;
       touch-action: manipulation;
-      font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+      font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
     }
-    .wrap {
-      box-sizing: border-box;
-      width: 100vw; height: 100vh;
+    .wrap{
+      box-sizing:border-box;
+      width:100vw; height:100vh;
       padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display:flex; align-items:center; justify-content:center;
     }
-    .card {
-      width: min(92vw, 900px);
-      height: min(86vh, 1200px);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 22px;
+    .card{
+      width:min(92vw,900px);
+      height:min(86vh,1200px);
+      display:flex; flex-direction:column;
+      justify-content:center;
+      gap:22px;
     }
-    .title {
-      font-size: clamp(32px, 5vw, 56px);
-      letter-spacing: 0.02em;
-      line-height: 1.25;
-      white-space: pre-wrap;
+    .title{
+      font-size:clamp(32px,5vw,56px);
+      letter-spacing:0.02em;
+      line-height:1.25;
+      white-space:pre-wrap;
     }
-    .body {
-      font-size: clamp(18px, 2.8vw, 34px);
-      line-height: 1.6;
-      white-space: pre-wrap;
+    .body{
+      font-size:clamp(18px,2.8vw,34px);
+      line-height:1.6;
+      white-space:pre-wrap;
     }
-    .hint {
-      font-size: clamp(16px, 2.2vw, 26px);
-      opacity: 0.85;
-      white-space: pre-wrap;
+    .hint{
+      font-size:clamp(16px,2.2vw,26px);
+      opacity:0.85;
+      white-space:pre-wrap;
+    }
+    .footer{
+      position:fixed; left:0; right:0; bottom:0;
+      padding:14px 18px calc(14px + env(safe-area-inset-bottom)) 18px;
+      display:flex; justify-content:space-between; align-items:center;
+      font-size:18px; opacity:0.8;
+    }
+    .btn{
+      padding:10px 14px;
+      border:1px solid #000;
+      border-radius:999px;
+      font-size:16px;
+      background:transparent;
     }
 
-    /* QR用 */
+    /* QR */
     .qrRow{
       display:flex;
       gap:24px;
@@ -73,32 +81,30 @@
       border: 1px solid #000;
     }
 
-    .footer {
-      position: fixed;
-      left: 0; right: 0; bottom: 0;
-      padding: 14px 18px calc(14px + env(safe-area-inset-bottom)) 18px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 18px;
-      opacity: 0.8;
-    }
-    .btn {
-      padding: 10px 14px;
-      border: 1px solid #000;
-      border-radius: 999px;
-      font-size: 16px;
-      background: transparent;
+    /* エラー表示 */
+    #err{
+      position:fixed;
+      inset:0;
+      background:#fff;
+      color:#000;
+      padding:24px;
+      white-space:pre-wrap;
+      font-size:16px;
+      line-height:1.5;
+      display:none;
+      z-index:9999;
     }
   </style>
 </head>
+
 <body>
+  <div id="err"></div>
+
   <div class="wrap" id="tapArea">
     <div class="card">
       <div class="title" id="t"></div>
       <div class="body" id="b"></div>
 
-      <!-- QRページの時だけ使う -->
       <div id="qrArea" style="display:none;">
         <div class="qrRow">
           <div class="qrBlock">
@@ -123,136 +129,194 @@
   </div>
 
   <script>
-    const QR_X_URL  = "https://kenonary.github.io/QR_027697_X.png";
-    const QR_IG_URL = "https://kenonary.github.io/QR_027719_ig.png";
+  (function(){
+    const showErr = (e) => {
+      const box = document.getElementById("err");
+      box.style.display = "block";
+      box.textContent =
+        "スクリプトエラーで表示が止まりました。\n\n" +
+        (e && (e.stack || e.message) ? (e.stack || e.message) : String(e));
+    };
 
-    const pages = [
-      {
-        t: "故　　　　創儀会場",
-        b: "　\n画面に触れて\n参列手順を表示\n\n現在担当者は鯨幕左側のバックスペースにおります。\nご用件があればお気軽にお声がけください。",
-        h: ""
-      },
-      {
-        t: "電子焼香の手順",
-        // 「焼香台解説の位置がぎこちない」対策：手順ブロックをまとまりとして見せる
-        b: "焼香台の手前で一礼\n\n焼香台の前までお進みください\n\n――――――――\n操作手順\n右枠 → 左枠の順に二度触れてください\n左枠の表示が収束するまでお待ちください\n――――――――\n\n一礼",
-        h: ""
-      },
-      {
-        t: "",
-        // 指定文面を自然に：1/16以降の収集を独立行に
-        b: "ここでは未完成の創作物の葬儀を行っております\n\n様々な理由により未完成となった作品へ想いを寄せる場です\n\n本展示は、1月16日より現在までGoogleフォームで収集した供養データにより構成されています\n\n作品は椅子にお掛けになってご覧いただけます",
-        h: ""
-      },
-      {
-        t: "",
-        b: "正面のモニターでは、供養データの一部を遺影として表示しています\n\n映像・音楽・文字などの様々な媒体の創作物が投影されます\n\n電子焼香に表示された文字列は、供養データをテキスト化したものです",
-        h: ""
-      },
-      {
-        t: "unicode戒名について",
-        b: "メインモニターに表示される漢字は、供養データに付随するファイル名をもとに生成されています\n\nデータのファイル名をUnicodeで数値化し、煩悩の数108を媒介して漢字変換しています\n\n忌み文字が出た場合は、追加で同様の処理を行い回避する設計となっております",
-        h: ""
-      },
-      {
-        t: "電子音響による儀礼的自動演奏",
-        b: "12:00　14:00　16:00　18:00（13,14日のみ）\n\n各回15分\n\n※状況によって不定期演奏も行われます",
-        h: ""
-      },
-      {
-        t: "創儀 - Rejected in Peace",
-        // ここでJSが壊れてたので修正（末尾の \ を除去）
-        b: "制作全般\n◯▲⬜︎　zerobe\n\n協力\nとがさん　わたえい　木葉はづく　EPOCALC　原口沙輔\n\n取材協力\nいととと　今井科学　こんぺいとう雑誌　EPOCALC　キョウ玉　原口沙輔　とがさん　.+　zerobe　木葉はづく\n\n公式SNS / 供養フォームは次ページのQRよりご覧いただけます",
-        h: "※QRページはタップで次へ進むと表示されます"
-      },
-      {
-        // 新規：SNS QRページ（音声案内の代わり）
-        t: "公式SNS　QR",
-        b: "下記QRよりアクセスできます\n\n・X\n・Instagram\n\n（案内：QRを配置するページを別で作成し、このリンクの画像を表示しています）",
-        h: ""
+    try {
+      const QR_X_URL  = "https://kenonary.github.io/QR_027697_X.png";
+      const QR_IG_URL = "https://kenonary.github.io/QR_027719_ig.png";
+
+      const pages = [
+        {
+          t: "故　　　　創儀会場",
+          b: `　
+画面に触れて
+参列手順を表示
+
+現在担当者は鯨幕左側のバックスペースにおります。
+ご用件があればお気軽にお声がけください。`,
+          h: ""
+        },
+        {
+          t: "電子焼香の手順",
+          b: `焼香台の手前で一礼
+
+焼香台の前までお進みください
+
+――――――――
+操作手順
+右枠 → 左枠の順に二度触れてください
+左枠の表示が収束するまでお待ちください
+――――――――
+
+一礼`,
+          h: ""
+        },
+        {
+          t: "",
+          b: `ここでは未完成の創作物の葬儀を行っております
+
+様々な理由により未完成となった作品へ想いを寄せる場です
+
+本展示は、1月16日より現在までGoogleフォームで収集した供養データにより構成されています
+
+作品は椅子にお掛けになってご覧いただけます`,
+          h: ""
+        },
+        {
+          t: "",
+          b: `正面のモニターでは、供養データの一部を遺影として表示しています
+
+映像・音楽・文字などの様々な媒体の創作物が投影されます
+
+電子焼香に表示された文字列は、供養データをテキスト化したものです`,
+          h: ""
+        },
+        {
+          t: "unicode戒名について",
+          b: `メインモニターに表示される漢字は、供養データに付随するファイル名をもとに生成されています
+
+データのファイル名をUnicodeで数値化し、煩悩の数108を媒介して漢字変換しています
+
+忌み文字が出た場合は、追加で同様の処理を行い回避する設計となっております`,
+          h: ""
+        },
+        {
+          t: "電子音響による儀礼的自動演奏",
+          b: `12:00　14:00　16:00　18:00（13,14日のみ）
+
+各回15分
+
+※状況によって不定期演奏も行われます`,
+          h: ""
+        },
+        {
+          t: "創儀 - Rejected in Peace",
+          b: `制作全般
+◯▲⬜︎　zerobe
+
+協力
+とがさん　わたえい　木葉はづく　EPOCALC　原口沙輔
+
+取材協力
+いととと　今井科学　こんぺいとう雑誌　EPOCALC　キョウ玉　原口沙輔　とがさん　.+　zerobe　木葉はづく
+
+公式SNS / 供養フォームは次ページのQRよりご覧いただけます`,
+          h: ""
+        },
+        {
+          t: "公式SNS　QR",
+          b: `下記QRよりアクセスできます
+
+・X
+・Instagram
+
+（案内：QRを配置するページを別で作成し、このリンクの画像を表示しています）`,
+          h: ""
+        }
+      ];
+
+      let idx = 0;
+      const idleMs = 40 * 1000;
+      let idleTimer = null;
+
+      const tEl = document.getElementById("t");
+      const bEl = document.getElementById("b");
+      const hEl = document.getElementById("h");
+      const pageEl = document.getElementById("page");
+
+      const qrArea = document.getElementById("qrArea");
+      const qrX = document.getElementById("qrX");
+      const qrIG = document.getElementById("qrIG");
+
+      function render(){
+        const p = pages[idx];
+        tEl.textContent = p.t || "";
+        bEl.textContent = p.b || "";
+        hEl.textContent = p.h || "";
+        pageEl.textContent = `${idx + 1} / ${pages.length}`;
+
+        const isQR = (p.t === "公式SNS　QR");
+        qrArea.style.display = isQR ? "block" : "none";
+        if (isQR){
+          qrX.src = QR_X_URL;
+          qrIG.src = QR_IG_URL;
+        }
       }
-    ];
 
-    let idx = 0;
-    const idleMs = 40 * 1000;
-    let idleTimer = null;
+      function toHome(){ idx = 0; render(); }
+      function back(){ idx = (idx - 1 + pages.length) % pages.length; render(); }
+      function next(){ idx = (idx + 1) % pages.length; render(); }
 
-    const tEl = document.getElementById("t");
-    const bEl = document.getElementById("b");
-    const hEl = document.getElementById("h");
-    const pageEl = document.getElementById("page");
-
-    const qrArea = document.getElementById("qrArea");
-    const qrX = document.getElementById("qrX");
-    const qrIG = document.getElementById("qrIG");
-
-    function render() {
-      const p = pages[idx];
-      tEl.textContent = p.t || "";
-      bEl.textContent = p.b || "";
-      hEl.textContent = p.h || "";
-      pageEl.textContent = `${idx + 1} / ${pages.length}`;
-
-      // QRページだけ画像表示
-      const isQRPage = (p.t === "公式SNS　QR");
-      qrArea.style.display = isQRPage ? "block" : "none";
-      if (isQRPage) {
-        qrX.src = QR_X_URL;
-        qrIG.src = QR_IG_URL;
+      function resetIdle(){
+        if (idleTimer) clearTimeout(idleTimer);
+        idleTimer = setTimeout(() => { toHome(); }, idleMs);
       }
+
+      const tapArea = document.getElementById("tapArea");
+
+      tapArea.addEventListener("pointerup", (e) => {
+        if (e.target.closest("button")) return;
+        e.preventDefault();
+        resetIdle();
+        next();
+      }, { passive:false });
+
+      tapArea.addEventListener("touchend", (e) => {
+        if (window.PointerEvent) return;
+        e.preventDefault();
+        resetIdle();
+        next();
+      }, { passive:false });
+
+      tapArea.addEventListener("click", (e) => {
+        if (window.PointerEvent) return;
+        if (e.target.closest("button")) return;
+        resetIdle();
+        next();
+      });
+
+      document.getElementById("homeBtn").addEventListener("click", (e) => {
+        e.stopPropagation();
+        resetIdle();
+        toHome();
+      });
+
+      document.getElementById("backBtn").addEventListener("click", (e) => {
+        e.stopPropagation();
+        resetIdle();
+        back();
+      });
+
+      ["pointerdown","pointermove","keydown"].forEach(ev =>
+        document.addEventListener(ev, resetIdle, { passive:true })
+      );
+
+      render();
+      resetIdle();
+
+    } catch(e){
+      showErr(e);
     }
 
-    function toHome() { idx = 0; render(); }
-    function back() { idx = (idx - 1 + pages.length) % pages.length; render(); }
-    function next() { idx = (idx + 1) % pages.length; render(); }
-
-    function resetIdle() {
-      if (idleTimer) clearTimeout(idleTimer);
-      idleTimer = setTimeout(() => { toHome(); }, idleMs);
-    }
-
-    // pointer系だけで統一（iPad/PC両対応、二重発火しにくい）
-    const tapArea = document.getElementById("tapArea");
-
-    tapArea.addEventListener("pointerup", (e) => {
-      if (e.target.closest("button")) return;
-      e.preventDefault();
-      resetIdle();
-      next();
-    }, { passive: false });
-
-    tapArea.addEventListener("touchend", (e) => {
-      if (window.PointerEvent) return;
-      e.preventDefault();
-      resetIdle();
-      next();
-    }, { passive: false });
-
-    tapArea.addEventListener("click", (e) => {
-      if (window.PointerEvent) return;
-      if (e.target.closest("button")) return;
-      resetIdle();
-      next();
-    });
-
-    document.getElementById("homeBtn").addEventListener("click", (e) => {
-      e.stopPropagation();
-      resetIdle();
-      toHome();
-    });
-
-    document.getElementById("backBtn").addEventListener("click", (e) => {
-      e.stopPropagation();
-      resetIdle();
-      back();
-    });
-
-    ["pointerdown","pointermove","keydown"].forEach(ev =>
-      document.addEventListener(ev, resetIdle, { passive: true })
-    );
-
-    render();
-    resetIdle();
+    window.addEventListener("error", (ev) => showErr(ev.error || ev.message));
+  })();
   </script>
 </body>
 </html>
