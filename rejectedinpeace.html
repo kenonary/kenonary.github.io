@@ -24,31 +24,38 @@
     .wrap {
       box-sizing: border-box;
       width: 100vw; height: 100vh;
-      padding: 8vh 10vw;
+      padding: 8vh 10vw; /* 通常ページの余白 */
       display: flex;
       flex-direction: column;
       opacity: 1;
       transition: opacity 0.25s ease-in-out;
     }
 
-    /* 看板（最初の画面）レイアウト */
+    /* 看板（最初の画面）専用：上下左右中央揃え */
     .is-home {
+      padding: 0; /* 中央配置を邪魔する余白を消去 */
       justify-content: center;
       align-items: center;
       text-align: center;
     }
+    .is-home .card {
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
     .is-home .title {
-      font-size: clamp(60px, 11vw, 110px);
-      letter-spacing: 0.15em;
-      white-space: nowrap; /* 改行防止 */
+      font-size: clamp(60px, 12vw, 110px);
+      letter-spacing: 0.2em;
+      line-height: 1.6; /* 故 と 創儀会場 の間隔 */
       border: none;
       padding: 0;
       margin: 0;
+      white-space: pre-wrap; /* 改行を有効に */
     }
     .is-home .body {
       font-size: 24px;
-      margin-top: 60px;
-      opacity: 0.6;
+      margin-top: 5vh;
+      opacity: 0.5;
       letter-spacing: 0.1em;
     }
 
@@ -58,6 +65,7 @@
       flex-direction: column;
       gap: 4vh;
       height: 100%;
+      width: 100%;
     }
     .title {
       font-size: clamp(32px, 5vw, 48px);
@@ -71,15 +79,16 @@
       white-space: pre-wrap;
     }
 
-    /* フッター（左右入れ替え） */
+    /* フッター（左：戻る / 右：トップ） */
     .footer {
       position: fixed; left: 0; right: 0; bottom: 0;
       padding: 20px 50px calc(25px + env(safe-area-inset-bottom));
       display: flex;
-      flex-direction: row-reverse; /* 左右を逆転: 戻る(左) / トップ(右) */
+      flex-direction: row-reverse; /* 戻るを左、トップを右にするための入れ替え */
       justify-content: space-between;
       align-items: center;
       transition: opacity 0.3s;
+      z-index: 100;
     }
     .nav-btn {
       background: none; border: 1px solid #000;
@@ -87,10 +96,12 @@
       font-family: inherit; font-size: 18px;
       padding: 8px 24px;
       cursor: pointer;
+      color: #000;
     }
     #pageNo {
       font-size: 16px;
       letter-spacing: 0.1em;
+      opacity: 0.5;
     }
 
     /* プログレスバー（最初のページは除外） */
@@ -142,9 +153,8 @@
   (function(){
     const pages = [
       {
-        t: "故　　　　創儀会場",
-        b: "画面に触れて参列手順を表示",
-        isHome: true
+        t: "故\n創儀会場",
+        b: "画面に触れて参列手順を表示"
       },
       {
         t: "創儀について",
@@ -202,7 +212,7 @@
     ];
 
     let idx = 0;
-    const idleMs = 45 * 1000;
+    const idleMs = 60 * 1000;
     let idleTimer = null;
 
     const mainWrap = document.getElementById("mainWrap");
@@ -214,13 +224,12 @@
     const qrArea = document.getElementById("qrArea");
 
     function render(){
-      // フェードアウト開始
       mainWrap.style.opacity = 0;
       
       setTimeout(() => {
         const p = pages[idx];
         
-        // 最初の画面（看板）の特別処理
+        // 看板画面（インデックス0）のスタイル切り替え
         if(idx === 0) {
           mainWrap.classList.add('is-home');
           footerNav.style.visibility = "hidden";
@@ -229,18 +238,16 @@
         } else {
           mainWrap.classList.remove('is-home');
           footerNav.style.visibility = "visible";
-          // 1~7ページとしてカウント (全体8枚 - 看板1枚 = 7)
+          
           const currentP = idx;
           const totalP = pages.length - 1;
           barEl.style.width = (currentP / totalP * 100) + "%";
           pageNoEl.textContent = `${currentP} / ${totalP}`;
         }
 
-        // テキスト更新
         tEl.textContent = p.t;
         bEl.textContent = p.b;
         
-        // QR表示
         const isQR = (p.t === "公式SNS");
         qrArea.style.display = isQR ? "block" : "none";
         if(isQR) {
@@ -248,9 +255,8 @@
           document.getElementById("qrIG").src = "https://kenonary.github.io/QR_027719_ig.png";
         }
 
-        // フェードイン
         mainWrap.style.opacity = 1;
-      }, 250); // 透明になってから内容を書き換える
+      }, 250);
     }
 
     function next(){ idx = (idx + 1) % pages.length; render(); }
@@ -262,7 +268,7 @@
       idleTimer = setTimeout(toHome, idleMs);
     }
 
-    // イベント
+    // 画面タップで次へ（ボタン以外）
     document.addEventListener("pointerup", (e) => {
       if (e.target.closest("button")) return;
       resetIdle();
